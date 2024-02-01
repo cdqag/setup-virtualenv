@@ -1,0 +1,41 @@
+name: 'Setup virtualenv'
+description: 'Setup Python 3 Virtual Environment'
+
+author: "CDQ AG"
+branding:
+  icon: 'box'
+  color: 'blue'
+
+inputs:
+  python-bin:
+    description: 'Python binary to use'
+    required: true
+    default: 'python3'
+
+  virtualenv-path:
+    description: 'Path where will be stored virtualenv'
+    required: true
+    default: '.venv'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install virtualenv if not installed
+      shell: bash
+      run: |
+        if [ ! -x "$(command -v virtualenv)" ]; then
+          ${{ inputs.python-bin }} -m pip install --user virtualenv
+        fi
+
+    - name: Create virtualenv if does not exist
+      shell: bash
+      run: |
+        if [ ! -d "${{ inputs.virtualenv-path }}" ]; then
+          ${{ inputs.python-bin }} -m virtualenv ${{ inputs.virtualenv-path }}
+        fi
+
+    - name: Activate virtualenv
+      shell: bash
+      run: |
+        source ${{ inputs.virtualenv-path }}/bin/activate
+        echo "PATH=$PATH" >> $GITHUB_ENV
